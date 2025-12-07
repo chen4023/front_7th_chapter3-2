@@ -1,30 +1,22 @@
-// ============================================
 // Discount Model (순수 함수)
-// ============================================
 // 할인 계산 관련 비즈니스 로직
 
 import { CartItem, Coupon } from "../types";
 
-// ============================================
 // 타입 정의
-// ============================================
 
 export interface Discount {
   quantity: number;
   rate: number;
 }
 
-// ============================================
 // 상수
-// ============================================
 
 const BULK_PURCHASE_THRESHOLD = 10;
 const BULK_PURCHASE_BONUS = 0.05;
 const MAX_DISCOUNT_RATE = 0.5;
 
-// ============================================
 // 수량별 할인 계산 함수
-// ============================================
 
 /** 수량에 따른 기본 할인율 계산 */
 export const getQuantityDiscount = (
@@ -68,9 +60,9 @@ export const getMaxApplicableDiscount = (
   return applyBulkPurchaseBonus(baseDiscount, isBulkPurchase);
 };
 
-// ============================================
+
 // 금액 계산 함수
-// ============================================
+
 
 /** 할인 적용 후 금액 계산 */
 export const applyDiscount = (price: number, discountRate: number): number => {
@@ -95,9 +87,7 @@ export const calculateTotalAfterItemDiscount = (cart: CartItem[]): number => {
   return cart.reduce((sum, item) => sum + calculateItemTotal(item, cart), 0);
 };
 
-// ============================================
 // 쿠폰 할인 함수
-// ============================================
 
 /** 쿠폰 할인 적용 */
 export const applyCouponDiscount = (
@@ -135,9 +125,7 @@ export const calculateCartTotal = (
   };
 };
 
-// ============================================
 // 할인 유효성 검증 함수
-// ============================================
 
 /** 할인 규칙 유효성 검증 */
 export const validateDiscount = (
@@ -152,18 +140,4 @@ export const validateDiscount = (
   }
 
   return { valid: true };
-};
-
-// ============================================
-// 포맷팅 함수
-// ============================================
-
-/** 할인율 포맷팅 (0.1 -> "10%") */
-export const formatDiscountRate = (rate: number): string => {
-  return `${Math.round(rate * 100)}%`;
-};
-
-/** 할인 금액 포맷팅 */
-export const formatDiscountAmount = (amount: number): string => {
-  return `${amount.toLocaleString()}원`;
 };
