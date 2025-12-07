@@ -4,25 +4,9 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-    inputs:
-      target:
-        description: 'Build target'
-        required: true
-        default: 'basic'
-        type: choice
-        options:
-          - basic
-          - advanced
-          - origin
-
-# 기본 환경변수 정의
-env:
-  DEFAULT_BUILD_TARGET: basic
-  NODE_VERSION: 20
-  PNPM_VERSION: 9
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -31,13 +15,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    env:
-      # Repository Variable 사용 (없으면 기본값)
-      BUILD_TARGET: ${{ github.event.inputs.target || vars.BUILD_TARGET || 'basic' }}
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup pnpm
@@ -54,42 +35,138 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Display build target
-        run: echo "🎯 Building target - ${{ env.BUILD_TARGET }}"
-
-      - name: Run tests
-        run: pnpm test:${{ env.BUILD_TARGET }} --run
-
-      - name: Build for production
+      # ===== Basic 빌드 =====
+      - name: Build Basic
         run: pnpm build
         env:
-          BUILD_TARGET: ${{ env.BUILD_TARGET }}
-          BASE_URL: /${{ github.event.repository.name }}/
+          BUILD_TARGET: basic
+          BASE_URL: /${{ github.event.repository.name }}/basic/
 
-      - name: Rename HTML file for GitHub Pages
+      - name: Move Basic build
         run: |
-          cd dist
-          if [ -f "index.${{ env.BUILD_TARGET }}.html" ]; then
-            mv "index.${{ env.BUILD_TARGET }}.html" index.html
-            echo "✅ Renamed index.${{ env.BUILD_TARGET }}.html → index.html"
+          mkdir -p deploy/basic
+          mv dist/* deploy/basic/
+          if [ -f "deploy/basic/index.basic.html" ]; then
+            mv deploy/basic/index.basic.html deploy/basic/index.html
           fi
-          ls -la
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
+      # ===== Advanced 빌드 =====
+      - name: Build Advanced
+        run: pnpm build
+        env:
+          BUILD_TARGET: advanced
+          BASE_URL: /${{ github.event.repository.name }}/advanced/
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Move Advanced build
+        run: |
+          mkdir -p deploy/advanced
+          mv dist/* deploy/advanced/
+          if [ -f "deploy/advanced/index.advanced.html" ]; then
+            mv deploy/advanced/index.advanced.html deploy/advanced/index.html
+          fi
+
+      # ===== 루트 index.html 생성 =====
+      - name: Create root index
+        run: |
+          cat > deploy/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="ko">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>장바구니 프로젝트</title>
+            <style>
+              * { margin: 0; padding: 0; box-sizing: border-box; }
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              }
+              .container {
+                text-align: center;
+                padding: 3rem;
+                background: white;
+                border-radius: 20px;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+              }
+              h1 {
+                font-size: 2.5rem;
+                margin-bottom: 0.5rem;
+                color: #333;
+              }
+              p {
+                color: #666;
+                margin-bottom: 2rem;
+              }
+              .links {
+                display: flex;
+                gap: 1.5rem;
+                justify-content: center;
+              }
+              a {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 2rem 3rem;
+                text-decoration: none;
+                border-radius: 12px;
+                transition: transform 0.2s, box-shadow 0.2s;
+              }
+              a:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+              }
+              .basic {
+                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+                color: white;
+              }
+              .advanced {
+                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                color: white;
+              }
+              .icon {
+                font-size: 3rem;
+                margin-bottom: 0.5rem;
+              }
+              .label {
+                font-size: 1.25rem;
+                font-weight: 600;
+              }
+              .desc {
+                font-size: 0.875rem;
+                opacity: 0.9;
+                margin-top: 0.25rem;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <h1>🛒 장바구니 프로젝트</h1>
+              <p>Chapter 3-2: 디자인 패턴 학습</p>
+              <div class="links">
+                <a href="./basic/" class="basic">
+                  <span class="icon">📦</span>
+                  <span class="label">Basic</span>
+                  <span class="desc">기본 리팩토링</span>
+                </a>
+                <a href="./advanced/" class="advanced">
+                  <span class="icon">🚀</span>
+                  <span class="label">Advanced</span>
+                  <span class="desc">Jotai 전역상태</span>
+                </a>
+              </div>
+            </div>
+          </body>
+          </html>
+          EOF
+
+      # ===== gh-pages 브랜치에 배포 =====
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          path: './dist'
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy
+          publish_branch: gh-pages
