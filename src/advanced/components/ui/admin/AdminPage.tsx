@@ -4,24 +4,18 @@ import { AdminHeader } from "./AdminHeader";
 import { AdminTabs, AdminTabType } from "./AdminTabs";
 import { ProductSection } from "./product/ProductSection";
 import { CouponSection } from "./coupon/CouponSection";
-import { NotifyFn, UseProductsReturn } from "@/basic/hooks/useProducts";
-import { UseCouponsReturn } from "@/basic/hooks/useCoupons";
+import { useProducts } from "../../../hooks/useProducts";
+import { useCoupons } from "../../../hooks/useCoupons";
+import { useNotifications } from "../../../hooks/useNotifications";
 
-// 타입 import
-
-interface AdminPageProps {
-  productActions: UseProductsReturn;
-  couponActions: UseCouponsReturn;
-  addNotification: NotifyFn;
-}
-
-export function AdminPage({
-  productActions,
-  couponActions,
-  addNotification,
-}: AdminPageProps) {
-  // 🔹 탭 상태 추가
+export function AdminPage() {
+  // 탭 상태
   const [activeTab, setActiveTab] = useState<AdminTabType>("products");
+
+  // 전역 상태에서 직접 가져오기
+  const { addNotification } = useNotifications();
+  const productActions = useProducts({ onNotify: addNotification });
+  const couponActions = useCoupons({ onNotify: addNotification });
 
   return (
     <main className="max-w-7xl mx-auto px-4 py-8">
