@@ -1,6 +1,6 @@
-// ============================================
+
 // useCart Hook (Jotai 기반)
-// ============================================
+
 // 역할: store의 atom과 models 사이의 중간 계층
 // - store에서 상태 읽기
 // - models로 비즈니스 로직 위임
@@ -18,9 +18,9 @@ import {
 } from "../store";
 import * as cartModel from "../models/cart";
 
-// ============================================
+
 // 타입 정의
-// ============================================
+
 
 type NotifyFn = (message: string, type: "error" | "success" | "warning") => void;
 
@@ -58,9 +58,9 @@ interface UseCartReturn {
   getRemainingStock: (product: Product) => number;
 }
 
-// ============================================
+
 // useCart Hook
-// ============================================
+
 
 export function useCart(options: UseCartOptions = {}): UseCartReturn {
   const { onNotify } = options;

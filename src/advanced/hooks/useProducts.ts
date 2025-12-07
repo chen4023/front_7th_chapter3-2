@@ -1,6 +1,6 @@
-// ============================================
+
 // useProducts Hook (Jotai 기반)
-// ============================================
+
 // 역할: store의 atom과 models 사이의 중간 계층
 // - store에서 상태 읽기
 // - models로 비즈니스 로직 위임
@@ -12,9 +12,9 @@ import { ProductWithUI } from "../types";
 import { productsAtom, productCountAtom } from "../store";
 import * as productModel from "../models/product";
 
-// ============================================
+
 // 타입 정의
-// ============================================
+
 
 export type NotifyFn = (
   message: string,
@@ -49,9 +49,9 @@ export interface UseProductsReturn {
   removeProductDiscount: (productId: string, discountIndex: number) => boolean;
 }
 
-// ============================================
+
 // useProducts Hook
-// ============================================
+
 
 export function useProducts(options: UseProductsOptions = {}): UseProductsReturn {
   const { onNotify } = options;

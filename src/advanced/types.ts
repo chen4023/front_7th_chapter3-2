@@ -1,6 +1,6 @@
-// ============================================
+
 // 기본 타입
-// ============================================
+
 
 export interface Discount {
   quantity: number;
@@ -38,9 +38,9 @@ export interface Notification {
   type: "error" | "success" | "warning";
 }
 
-// ============================================
+
 // 결과 타입 (Result 패턴)
-// ============================================
+
 
 export type Result<T> =
   | { success: true; data: T }

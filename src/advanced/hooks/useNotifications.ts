@@ -1,6 +1,6 @@
-// ============================================
+
 // useNotifications Hook (Jotai 기반)
-// ============================================
+
 // 역할: 알림 상태 관리 + 자동 제거
 
 import { useCallback } from "react";
@@ -8,9 +8,9 @@ import { useAtom, useAtomValue } from "jotai";
 import { Notification } from "../types";
 import { notificationsAtom, notificationCountAtom } from "../store";
 
-// ============================================
+
 // 타입 정의
-// ============================================
+
 
 export type NotifyFn = (
   message: string,
@@ -29,9 +29,9 @@ interface UseNotificationsReturn {
   clearNotifications: () => void;
 }
 
-// ============================================
+
 // useNotifications Hook
-// ============================================
+
 
 export function useNotifications(
   options: UseNotificationsOptions = {}

@@ -1,7 +1,5 @@
-// ============================================
 // Coupon Model (순수 함수)
-// ============================================
-// 아키텍처: models (순수함수) → hooks (상태+알림) → Component
+// 역할: 쿠폰 CRUD
 
 import { Coupon } from "../types";
 
@@ -10,9 +8,7 @@ export type CouponResult<T> =
   | { success: true; data: T }
   | { success: false; error: string };
 
-// ============================================
 // 쿠폰 조회 함수
-// ============================================
 
 /** 코드로 쿠폰 찾기 */
 export const findCouponByCode = (
@@ -27,9 +23,7 @@ export const isCouponCodeExists = (code: string, coupons: Coupon[]): boolean => 
   return coupons.some((coupon) => coupon.code === code);
 };
 
-// ============================================
 // 쿠폰 CRUD 함수 (불변성 유지)
-// ============================================
 
 /** 쿠폰 추가 */
 export const addCoupon = (

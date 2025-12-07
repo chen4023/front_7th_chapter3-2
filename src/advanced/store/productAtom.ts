@@ -1,6 +1,6 @@
-// ============================================
+
 // Product Store (Jotai Atom)
-// ============================================
+
 // 상품 전역 상태 - 순수하게 상태만 정의
 //
 // 아키텍처:
@@ -12,9 +12,9 @@ import { ProductWithUI } from "../types";
 import { initialProducts } from "../constants";
 import * as productModel from "../models/product";
 
-// ============================================
+
 // Base Atoms
-// ============================================
+
 
 /** 상품 목록 (localStorage 동기화) */
 export const productsAtom = atomWithStorage<ProductWithUI[]>(
@@ -22,9 +22,9 @@ export const productsAtom = atomWithStorage<ProductWithUI[]>(
   initialProducts
 );
 
-// ============================================
+
 // Derived Atoms (읽기 전용)
-// ============================================
+
 
 /** 상품 개수 */
 export const productCountAtom = atom((get) => get(productsAtom).length);

@@ -1,6 +1,6 @@
-// ============================================
+
 // Cart Store (Jotai Atom)
-// ============================================
+
 // 장바구니 전역 상태 - 순수하게 상태만 정의
 //
 // 아키텍처:
@@ -11,9 +11,9 @@ import { atomWithStorage } from "jotai/utils";
 import { CartItem, Coupon, Product } from "../types";
 import * as cartModel from "../models/cart";
 
-// ============================================
+
 // Base Atoms
-// ============================================
+
 
 /** 장바구니 아이템 (localStorage 동기화) */
 export const cartAtom = atomWithStorage<CartItem[]>("cart", []);
@@ -21,9 +21,9 @@ export const cartAtom = atomWithStorage<CartItem[]>("cart", []);
 /** 선택된 쿠폰 */
 export const selectedCouponAtom = atom<Coupon | null>(null);
 
-// ============================================
+
 // Derived Atoms (읽기 전용) - models 함수 활용
-// ============================================
+
 
 /** 총 아이템 개수 */
 export const totalItemCountAtom = atom((get) => {

@@ -4,9 +4,9 @@
 import { useState, useCallback } from "react";
 import { ProductWithUI } from "@/types";
 
-// ============================================
+
 // 타입 & 상수
-// ============================================
+
 export interface ProductFormData {
   name: string;
   price: number;
@@ -42,9 +42,9 @@ export interface ProductFormHook {
   submit: (e: React.FormEvent) => void;
 }
 
-// ============================================
+
 // Hook
-// ============================================
+
 export function useProductForm({
   addProduct,
   updateProduct,
