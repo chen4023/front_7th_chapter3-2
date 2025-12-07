@@ -1,13 +1,13 @@
-// ============================================
+
 // Product Model (순수 함수)
-// ============================================
+
 // 아키텍처: models (순수함수) → hooks (상태+알림) → Component
 
 import { ProductWithUI } from "../types";
 
-// ============================================
+
 // 타입 정의
-// ============================================
+
 
 export interface Discount {
   quantity: number;
@@ -18,9 +18,9 @@ export type ProductResult<T> =
   | { success: true; data: T }
   | { success: false; error: string };
 
-// ============================================
+
 // 상품 조회 함수
-// ============================================
+
 
 /** ID로 상품 찾기 */
 export const findProductById = (
@@ -38,9 +38,9 @@ export const isProductExists = (
   return products.some((product) => product.id === productId);
 };
 
-// ============================================
+
 // 상품 CRUD 함수 (불변성 유지)
-// ============================================
+
 
 /** 상품 추가 */
 export const addProduct = (
@@ -105,9 +105,9 @@ export const removeProduct = (
   return { success: true, data: newProducts };
 };
 
-// ============================================
+
 // 재고 관련 함수
-// ============================================
+
 
 /** 재고 수정 */
 export const updateProductStock = (
@@ -122,9 +122,9 @@ export const updateProductStock = (
   return updateProduct(productId, { stock: newStock }, products);
 };
 
-// ============================================
+
 // 할인 규칙 관련 함수
-// ============================================
+
 
 /** 할인 규칙 추가 */
 export const addProductDiscount = (
@@ -181,4 +181,25 @@ export const removeProductDiscount = (
   const newDiscounts = product.discounts.filter((_, index) => index !== discountIndex);
 
   return updateProduct(productId, { discounts: newDiscounts }, products);
+};
+
+
+// 검색/필터 함수
+
+
+/** 상품 검색 (이름, 설명 기준) */
+export const filterProductsBySearch = <T extends ProductWithUI>(
+  products: T[],
+  searchTerm: string
+): T[] => {
+  if (!searchTerm.trim()) {
+    return products;
+  }
+
+  const lowerSearchTerm = searchTerm.toLowerCase();
+  return products.filter(
+    (product) =>
+      product.name.toLowerCase().includes(lowerSearchTerm) ||
+      (product.description?.toLowerCase().includes(lowerSearchTerm) ?? false)
+  );
 };
