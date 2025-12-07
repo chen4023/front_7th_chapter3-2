@@ -10,4 +10,4 @@ export { cartAtom, selectedCouponAtom, totalItemCountAtom } from "./cartAtom";
 export { couponsAtom, couponCountAtom, getCouponByCodeAtom } from "./couponAtom";
 
 // Notification Store
-export { notificationsAtom, notificationCountAtom, hasNotificationsAtom } from "./notificationAtom";
+export { notificationsAtom } from "./notificationAtom";

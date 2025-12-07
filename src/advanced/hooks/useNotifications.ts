@@ -1,16 +1,9 @@
-
 // useNotifications Hook (Jotai 기반)
 
-// 역할: 알림 상태 관리 + 자동 제거
-
 import { useCallback } from "react";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import { Notification } from "../types";
-import { notificationsAtom, notificationCountAtom } from "../store";
-
-
-// 타입 정의
-
+import { notificationsAtom } from "../store";
 
 export type NotifyFn = (
   message: string,
@@ -29,27 +22,21 @@ interface UseNotificationsReturn {
   clearNotifications: () => void;
 }
 
-
-// useNotifications Hook
-
-
 export function useNotifications(
   options: UseNotificationsOptions = {}
 ): UseNotificationsReturn {
   const { autoRemoveDelay = 3000 } = options;
 
-  // === store에서 상태 읽기 ===
   const [notifications, setNotifications] = useAtom(notificationsAtom);
-  const notificationCount = useAtomValue(notificationCountAtom);
 
-  // === 알림 추가 ===
+  // 직접 계산
+  const notificationCount = notifications.length;
+
   const addNotification: NotifyFn = useCallback(
     (message, type = "success") => {
       const id = Date.now().toString();
-
       setNotifications((prev) => [...prev, { id, message, type }]);
 
-      // 자동 제거
       if (autoRemoveDelay > 0) {
         setTimeout(() => {
           setNotifications((prev) => prev.filter((n) => n.id !== id));
@@ -59,7 +46,6 @@ export function useNotifications(
     [setNotifications, autoRemoveDelay]
   );
 
-  // === 알림 제거 ===
   const removeNotification = useCallback(
     (id: string) => {
       setNotifications((prev) => prev.filter((n) => n.id !== id));
@@ -67,7 +53,6 @@ export function useNotifications(
     [setNotifications]
   );
 
-  // === 모든 알림 제거 ===
   const clearNotifications = useCallback(() => {
     setNotifications([]);
   }, [setNotifications]);
