@@ -1,14 +1,8 @@
-
 // Product Model (순수 함수)
-
-// 아키텍처: models (순수함수) → hooks (상태+알림) → Component
 
 import { ProductWithUI } from "../types";
 
-
 // 타입 정의
-
-
 export interface Discount {
   quantity: number;
   rate: number;
@@ -18,30 +12,22 @@ export type ProductResult<T> =
   | { success: true; data: T }
   | { success: false; error: string };
 
-
-// 상품 조회 함수
-
-
-/** ID로 상품 찾기 */
-export const findProductById = (
+// 내부 헬퍼 함수 (export 불필요)
+const findProductById = (
   productId: string,
   products: ProductWithUI[]
 ): ProductWithUI | undefined => {
   return products.find((product) => product.id === productId);
 };
 
-/** 상품 존재 여부 확인 */
-export const isProductExists = (
+const isProductExists = (
   productId: string,
   products: ProductWithUI[]
 ): boolean => {
   return products.some((product) => product.id === productId);
 };
 
-
-// 상품 CRUD 함수 (불변성 유지)
-
-
+// 상품 CRUD 함수
 /** 상품 추가 */
 export const addProduct = (
   newProduct: Omit<ProductWithUI, "id">,
@@ -105,10 +91,6 @@ export const removeProduct = (
   return { success: true, data: newProducts };
 };
 
-
-// 재고 관련 함수
-
-
 /** 재고 수정 */
 export const updateProductStock = (
   productId: string,
@@ -118,14 +100,10 @@ export const updateProductStock = (
   if (newStock < 0) {
     return { success: false, error: "재고는 0 이상이어야 합니다." };
   }
-
   return updateProduct(productId, { stock: newStock }, products);
 };
 
-
-// 할인 규칙 관련 함수
-
-
+// 할인 규칙 함수
 /** 할인 규칙 추가 */
 export const addProductDiscount = (
   productId: string,
@@ -179,14 +157,10 @@ export const removeProductDiscount = (
   }
 
   const newDiscounts = product.discounts.filter((_, index) => index !== discountIndex);
-
   return updateProduct(productId, { discounts: newDiscounts }, products);
 };
 
-
-// 검색/필터 함수
-
-
+// 검색 함수
 /** 상품 검색 (이름, 설명 기준) */
 export const filterProductsBySearch = <T extends ProductWithUI>(
   products: T[],

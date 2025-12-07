@@ -1,20 +1,10 @@
-
 // useProducts Hook (Jotai 기반)
 
-// 역할: store의 atom과 models 사이의 중간 계층
-// - store에서 상태 읽기
-// - models로 비즈니스 로직 위임
-// - 알림 처리 (부수효과)
-
 import { useCallback } from "react";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import { ProductWithUI } from "../types";
-import { productsAtom, productCountAtom } from "../store";
+import { productsAtom } from "../store";
 import * as productModel from "../models/product";
-
-
-// 타입 정의
-
 
 export type NotifyFn = (
   message: string,
@@ -26,22 +16,15 @@ interface UseProductsOptions {
 }
 
 export interface UseProductsReturn {
-  // 상태
   products: ProductWithUI[];
   productCount: number;
-
-  // CRUD 액션
   addProduct: (product: Omit<ProductWithUI, "id">) => boolean;
   updateProduct: (
     productId: string,
     updates: Partial<Omit<ProductWithUI, "id">>
   ) => boolean;
   removeProduct: (productId: string) => boolean;
-
-  // 재고 액션
   updateProductStock: (productId: string, newStock: number) => boolean;
-
-  // 할인 액션
   addProductDiscount: (
     productId: string,
     discount: productModel.Discount
@@ -49,18 +32,14 @@ export interface UseProductsReturn {
   removeProductDiscount: (productId: string, discountIndex: number) => boolean;
 }
 
-
-// useProducts Hook
-
-
 export function useProducts(options: UseProductsOptions = {}): UseProductsReturn {
   const { onNotify } = options;
 
-  // === store에서 상태 읽기 ===
   const [products, setProducts] = useAtom(productsAtom);
-  const productCount = useAtomValue(productCountAtom);
 
-  // === 헬퍼: 안전한 알림 호출 ===
+  // 직접 계산
+  const productCount = products.length;
+
   const notify = useCallback(
     (message: string, type: "error" | "success" | "warning") => {
       onNotify?.(message, type);
@@ -68,16 +47,13 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
     [onNotify]
   );
 
-  // === 액션: 상품 추가 ===
   const addProduct = useCallback(
     (newProduct: Omit<ProductWithUI, "id">): boolean => {
       const result = productModel.addProduct(newProduct, products);
-
       if (!result.success) {
         notify(result.error, "error");
         return false;
       }
-
       setProducts(result.data);
       notify("상품이 추가되었습니다.", "success");
       return true;
@@ -85,16 +61,13 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
     [products, setProducts, notify]
   );
 
-  // === 액션: 상품 수정 ===
   const updateProduct = useCallback(
     (productId: string, updates: Partial<Omit<ProductWithUI, "id">>): boolean => {
       const result = productModel.updateProduct(productId, updates, products);
-
       if (!result.success) {
         notify(result.error, "error");
         return false;
       }
-
       setProducts(result.data);
       notify("상품이 수정되었습니다.", "success");
       return true;
@@ -102,16 +75,13 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
     [products, setProducts, notify]
   );
 
-  // === 액션: 상품 삭제 ===
   const removeProduct = useCallback(
     (productId: string): boolean => {
       const result = productModel.removeProduct(productId, products);
-
       if (!result.success) {
         notify(result.error, "error");
         return false;
       }
-
       setProducts(result.data);
       notify("상품이 삭제되었습니다.", "success");
       return true;
@@ -119,16 +89,13 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
     [products, setProducts, notify]
   );
 
-  // === 액션: 재고 수정 ===
   const updateProductStock = useCallback(
     (productId: string, newStock: number): boolean => {
       const result = productModel.updateProductStock(productId, newStock, products);
-
       if (!result.success) {
         notify(result.error, "error");
         return false;
       }
-
       setProducts(result.data);
       notify("재고가 수정되었습니다.", "success");
       return true;
@@ -136,16 +103,13 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
     [products, setProducts, notify]
   );
 
-  // === 액션: 할인 규칙 추가 ===
   const addProductDiscount = useCallback(
     (productId: string, discount: productModel.Discount): boolean => {
       const result = productModel.addProductDiscount(productId, discount, products);
-
       if (!result.success) {
         notify(result.error, "error");
         return false;
       }
-
       setProducts(result.data);
       notify("할인 규칙이 추가되었습니다.", "success");
       return true;
@@ -153,20 +117,13 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
     [products, setProducts, notify]
   );
 
-  // === 액션: 할인 규칙 삭제 ===
   const removeProductDiscount = useCallback(
     (productId: string, discountIndex: number): boolean => {
-      const result = productModel.removeProductDiscount(
-        productId,
-        discountIndex,
-        products
-      );
-
+      const result = productModel.removeProductDiscount(productId, discountIndex, products);
       if (!result.success) {
         notify(result.error, "error");
         return false;
       }
-
       setProducts(result.data);
       notify("할인 규칙이 삭제되었습니다.", "success");
       return true;
