@@ -7,7 +7,8 @@ import { useCart } from "../../../hooks/useCart";
 import { useProducts } from "../../../hooks/useProducts";
 import { useCoupons } from "../../../hooks/useCoupons";
 import { useNotifications } from "../../../hooks/useNotifications";
-import { calculateItemTotal, filterProductsBySearch } from "../../../models/cart";
+import { calculateItemTotal } from "../../../models/cart";
+import { filterProductsBySearch } from "../../../models/product";
 
 interface CartPageProps {
   debouncedSearchTerm: string;
