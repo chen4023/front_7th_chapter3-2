@@ -1,38 +1,25 @@
-// ============================================
 // Cart Model (순수 함수)
-// ============================================
-// 아키텍처: models (순수함수) → hooks (상태+알림) → Component
+// 역할: 장바구니 조작 (추가, 삭제, 수량 변경)
 
-import { CartItem, Coupon, Product, ProductWithUI } from "../types";
+import { CartItem, Coupon, Product } from "../types";
 import {
-  getMaxApplicableDiscount,
   calculateItemTotal,
   calculateCartTotal,
   validateDiscount,
-  formatDiscountRate,
-  formatDiscountAmount,
   Discount,
 } from "./discount";
 
-// Re-export discount 함수들
-export {
-  getMaxApplicableDiscount,
-  calculateItemTotal,
-  calculateCartTotal,
-  validateDiscount,
-  formatDiscountRate,
-  formatDiscountAmount,
-};
+// Re-export
+export { calculateItemTotal, validateDiscount, calculateCartTotal };
 export type { Discount };
 
 // Result 패턴
+
 export type CartResult<T> =
   | { success: true; data: T }
   | { success: false; error: string };
 
-// ============================================
 // 재고 관련 함수
-// ============================================
 
 /** 남은 재고 수량 계산 */
 export const getRemainingStock = (product: Product, cart: CartItem[]): number => {
@@ -40,18 +27,18 @@ export const getRemainingStock = (product: Product, cart: CartItem[]): number =>
   return product.stock - (cartItem?.quantity ?? 0);
 };
 
-// ============================================
+
 // 장바구니 아이템 수 계산
-// ============================================
+
 
 /** 장바구니 아이템 총 개수 계산 */
 export const calculateTotalItemCount = (cart: CartItem[]): number => {
   return cart.reduce((sum, item) => sum + item.quantity, 0);
 };
 
-// ============================================
+
 // 장바구니 조작 함수 (불변성 유지)
-// ============================================
+
 
 /** 장바구니에 상품 추가 */
 export const addItemToCart = (
@@ -122,9 +109,9 @@ export const updateCartItemQuantity = (
   return { success: true, data: newCart };
 };
 
-// ============================================
-// 쿠폰 관련 함수
-// ============================================
+
+// 쿠폰 적용 검증
+
 
 /** 쿠폰 적용 가능 여부 검증 */
 export const validateCouponApplication = (
@@ -141,25 +128,4 @@ export const validateCouponApplication = (
   }
 
   return { success: true, data: true };
-};
-
-// ============================================
-// 검색/필터 함수
-// ============================================
-
-/** 상품 검색 (이름, 설명 기준) */
-export const filterProductsBySearch = <T extends ProductWithUI>(
-  products: T[],
-  searchTerm: string
-): T[] => {
-  if (!searchTerm.trim()) {
-    return products;
-  }
-
-  const lowerSearchTerm = searchTerm.toLowerCase();
-  return products.filter(
-    (product) =>
-      product.name.toLowerCase().includes(lowerSearchTerm) ||
-      (product.description?.toLowerCase().includes(lowerSearchTerm) ?? false)
-  );
 };
