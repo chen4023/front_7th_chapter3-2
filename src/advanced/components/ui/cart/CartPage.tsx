@@ -1,29 +1,23 @@
 // components/CartPage.tsx
-import { useMemo } from 'react';
-import { Product, Coupon } from '@/types';
-import { ProductCard } from './ProductCard';
-import { Button } from '../common/button';
-import { useCart } from '../../../hooks/useCart';
-import { calculateItemTotal, filterProductsBySearch } from '../../../models/cart';
-// TODO: UI 분리 필요
-interface ProductWithUI extends Product {
-  description?: string;
-  isRecommended?: boolean;
-}
+import { useMemo } from "react";
+import { Product } from "../../../types";
+import { ProductCard } from "./ProductCard";
+import { Button } from "../common/button";
+import { useCart } from "../../../hooks/useCart";
+import { useProducts } from "../../../hooks/useProducts";
+import { useCoupons } from "../../../hooks/useCoupons";
+import { useNotifications } from "../../../hooks/useNotifications";
+import { calculateItemTotal, filterProductsBySearch } from "../../../models/cart";
 
 interface CartPageProps {
-  products: ProductWithUI[];
-  coupons: Coupon[];
-  cartActions: ReturnType<typeof useCart>;
   debouncedSearchTerm: string;
 }
 
-export function CartPage({
-  products,
-  coupons,
-  cartActions,
-  debouncedSearchTerm,
-}: CartPageProps) {
+export function CartPage({ debouncedSearchTerm }: CartPageProps) {
+  // 전역 상태에서 직접 가져오기
+  const { addNotification } = useNotifications();
+  const { products } = useProducts({ onNotify: addNotification });
+  const { coupons } = useCoupons({ onNotify: addNotification });
   const {
     cart,
     selectedCoupon,
@@ -35,7 +29,7 @@ export function CartPage({
     removeCoupon,
     completeOrder,
     getRemainingStock,
-  } = cartActions;
+  } = useCart({ onNotify: addNotification });
 
   // 필터링된 상품 목록
   const filteredProducts = useMemo(
@@ -220,7 +214,7 @@ export function CartPage({
                   {coupons.length > 0 && (
                     <select
                       className="w-full text-sm border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
-                      value={selectedCoupon?.code || ''}
+                      value={selectedCoupon?.code || ""}
                       onChange={(e) => {
                         const coupon = coupons.find(
                           (c) => c.code === e.target.value
@@ -233,7 +227,7 @@ export function CartPage({
                       {coupons.map((coupon) => (
                         <option key={coupon.code} value={coupon.code}>
                           {coupon.name} (
-                          {coupon.discountType === 'amount'
+                          {coupon.discountType === "amount"
                             ? `${coupon.discountValue.toLocaleString()}원`
                             : `${coupon.discountValue}%`}
                           )
